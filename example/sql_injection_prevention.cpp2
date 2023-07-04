@@ -1,0 +1,53 @@
+#ifdef _MSC_VER
+#define WIN32_MEAN_AND_LEAN
+#include "WinSock2.h"
+#endif
+#include "parameterized.hpp"
+#include "soci/session.h"
+#include "soci/rowset.h"
+#include "soci/mysql/soci-mysql.h"
+#include "pasteur/bind/sql/soci.h"
+
+bool get_name(const std::string &a_prompt, std::string &name) {
+    std::cout << a_prompt;
+    std::cin >> name;
+    return std::cin.good();
+}
+
+SqlQuery: (a_connectionString: std::string) = {
+    sql: soci::session = (soci::mysql, a_connectionString);
+
+    name: std::string = ();
+    if (!get_name("Enter username: ", name)) {
+		return;
+	}
+
+	emailType: std::string = ();
+    if (!get_name("Enter email type: (private/business)", emailType)) {
+		return;
+	}
+
+    rs: soci::rowset<std::string> = sql << "select email from demo.useremails where username = (name)$ and type=(emailType)$";
+
+    for rs do (email) {
+		std::cout << "(name)$'s email is (email)$\n";
+	}
+}
+
+void TrySqlQuery() {
+	// demonstrate automatic sql query parameterization
+	try {
+		// WARNING: Never put username/password in source code. These are FAKE and
+		// only here for demonstration purposes.
+		SqlQuery("host=localhost db=demo user=root password=123456");
+	}
+    catch (std::exception const &e)
+    {
+        std::cerr << "Error: " << e.what() << '\n';
+    }
+}
+
+main: ()->int = {
+	// demonstrate automatic sql query parameterization
+	TrySqlQuery();
+}

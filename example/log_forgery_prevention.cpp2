@@ -1,0 +1,12 @@
+#include "parameterized.hpp"
+#include "spdlog/spdlog.h"
+#include "pasteur/bind/log/spdlog.h"
+
+main: ()->int = {
+	// demonstarte logging (with automatic sanitization)
+	userUnsanitizedInput := "some bad thing\n[2023-04-14 00:39:23.260] [info] All ok ";
+	// normally the above user inputs causes injection of an extra line
+	spdlog::info("User entered {}", userUnsanitizedInput);
+	// with string interpolation newlines are automatically sanitized
+	spdlog::info("User entered (userUnsanitizedInput)$");
+}

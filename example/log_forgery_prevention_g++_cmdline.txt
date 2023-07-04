@@ -1,0 +1,1 @@
+g++ log_forgery_prevention.cpp -I ../include/ -I ../location/of/spdlog/ -std=c++2a

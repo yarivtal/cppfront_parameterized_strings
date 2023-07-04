@@ -430,7 +430,7 @@ auto expand_string_literal(
                 });
                 chunk.erase(last_it, std::end(chunk));
             }
-            parts.add_code("cpp2::to_string" + chunk);
+            parts.add_code("cpp2::embed" + chunk);
 
             current_start = pos+1;
         }
@@ -503,7 +503,7 @@ auto expand_raw_string_literal(
                 parts.add_string(text.substr(current_start, open - current_start));
             }
             //  Then put interpolated chunk into ret
-            parts.add_code("cpp2::to_string" + std::string{text.substr(open, pos - open)});
+            parts.add_code("cpp2::embed" + std::string{text.substr(open, pos - open)});
 
             current_start = pos+1;
         }

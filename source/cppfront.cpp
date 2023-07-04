@@ -1270,6 +1270,7 @@ public:
         if (!tokens.get_map().empty())
         {
             printer.print_extra( "\n#include \"cpp2util.h\"\n\n" );
+            printer.print_extra( "\n#include \"parameterized.hpp\"\n\n" );
         }
 
         for (auto& section : tokens.get_map())

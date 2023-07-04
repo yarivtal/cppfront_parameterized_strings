@@ -1,0 +1,41 @@
+#ifdef _MSC_VER
+#define WIN32_MEAN_AND_LEAN
+#include "WinSock2.h"
+#endif
+#include <sstream>
+#include "parameterized.hpp"
+
+struct systemcmd_parameterized_string_renderer {
+	std::stringstream m_strBuilder;
+	systemcmd_parameterized_string_renderer() {}
+
+	void render_string(const char* a_str, size_t a_len) {
+		m_strBuilder.write(a_str, a_len);
+	}
+
+	template<typename ArgT>
+	void render_arg(const ArgT& a_arg) {
+		// WARNING: This is FAR from being safe. It is very easy to bypass this measure of security!
+		// It is only shown for demonstration purposes. A more through approach is needed here.
+		// In general, system() can never be made safe (due to shell differences).
+		m_strBuilder << '\"' << a_arg << '\"'; // NOTE: This is good for windows command line and bash. Is it good for other shells as well?
+	}
+};
+
+
+System: (a_oscmd: std::string)->int = {
+	return ::system(a_oscmd.c_str());
+}
+
+System: (a_oscmd: _)->int = {
+	renderer: systemcmd_parameterized_string_renderer = ();
+	cpp2::render_parameterized_string(renderer, a_oscmd);
+	return ::system(renderer.m_strBuilder.str().c_str());
+}
+
+main: ()->int = {
+	// demonstrate os cmd injection
+	hostname := "www.google.com & ls";
+	// normally (calling system) the above line would cause an os command injection (ls would execute)
+	x := System("ping (hostname)$");
+}
